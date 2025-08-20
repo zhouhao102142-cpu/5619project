@@ -18,18 +18,13 @@ Scattered Information: Book details and reviews are spread across multiple platf
 
 
 
-Lack of Personalized Recommendations: Many platforms do not provide tailored suggestions based on individual preferences.
-
-
-
 Variable Review Quality: User reviews often lack credibility and structure, making it hard to make informed decisions.
 
 
 
 1.2 Project Goal
 
-Our goal is to build an integrated online platform where users can browse, purchase, and review books in one place, supported by a recommendation system and a high-quality review mechanism.
-
+Our goal is to build an integrated online platform where users can browse, purchase, and review books in one place.
 
 
 2\. Key Features
