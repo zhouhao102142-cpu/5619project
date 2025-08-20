@@ -40,11 +40,6 @@ Advanced Search \& Filters: Search by keywords, filter by rating, price, or publ
 Review \& Rating System: Post reviews, rate books, and upvote helpful comments.
 
 
-
-Personalized Recommendations: Suggest books based on user history and preferences.
-
-
-
 Purchase \& Payment: Buy physical or e-books with secure payment options.
 
 
