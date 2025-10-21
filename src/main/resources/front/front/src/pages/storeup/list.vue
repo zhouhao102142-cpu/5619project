@@ -1,13 +1,13 @@
 <template>
 <div :style='{"width":"100%","padding":"30px 7% 40px","margin":"0px auto","position":"relative","background":"#edeff1"}'>
-    <el-button :style='{"border":"0","cursor":"pointer","padding":"0 10px","margin":"0 10px 20px 0","color":"#fff","clear":"both","outline":"none","borderRadius":"6px","background":"#3795c4","width":"auto","lineHeight":"36px","fontSize":"14px","height":"36px"}' type="warning" size="mini" @click="backClick" class="el-icon-back">返回</el-button>
-    <div v-if="storeupType==1" class="section-title" :style='{"padding":"12px 0 0","margin":"0px auto","color":"#333","textAlign":"center","background":"none","width":"100%","fontSize":"24px","fontWeight":"600","height":"60px"}'>我的收藏</div>
+    <el-button :style='{"border":"0","cursor":"pointer","padding":"0 10px","margin":"0 10px 20px 0","color":"#fff","clear":"both","outline":"none","borderRadius":"6px","background":"#3795c4","width":"auto","lineHeight":"36px","fontSize":"14px","height":"36px"}' type="warning" size="mini" @click="backClick" class="el-icon-back">Back</el-button>
+    <div v-if="storeupType==1" class="section-title" :style='{"padding":"12px 0 0","margin":"0px auto","color":"#333","textAlign":"center","background":"none","width":"100%","fontSize":"24px","fontWeight":"600","height":"60px"}'>My Favorites</div>
     <el-form :inline="true" :model="formSearch" class="formSearch">
       <el-form-item>
-        <el-input v-model="formSearch.name" placeholder="名称"></el-input>
+        <el-input v-model="formSearch.name" placeholder="Book Name"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="getStoreupList(1)">查询</el-button>
+        <el-button type="primary" @click="getStoreupList(1)">Search</el-button>
       </el-form-item>
     </el-form>
     <el-row :gutter="20">
@@ -29,8 +29,8 @@
       :pager-count="7"
       :page-size="pageSize"
       :page-sizes="pageSizes"
-	  prev-text="上一页"
-      next-text="下一页"
+	  prev-text="Prev"
+      next-text="Next"
       :hide-on-single-page="false"
       :layout='["prev","pager","next"].join()'
       :total="total"

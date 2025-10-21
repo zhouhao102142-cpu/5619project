@@ -2,12 +2,12 @@
 <div>
 	<div :style='{"padding":"16px 12%","margin":"0px auto","borderColor":"#d8d8d8","borderRadius":"0px","background":"none","borderWidth":"0 0 3px","width":"100%","borderStyle":"solid"}' class="breadcrumb-preview">
 		<el-breadcrumb :separator="'/'" :style='{"fontSize":"16px","lineHeight":"1","justifyContent":"flex-start","display":"flex"}'>
-			<el-breadcrumb-item class="item1" to="/"><a>首页</a></el-breadcrumb-item>
-			<el-breadcrumb-item class="item2" v-for="(item, index) in breadcrumbItem" :key="index"><a>{{item.name}}</a></el-breadcrumb-item>
+			<el-breadcrumb-item class="item1" to="/"><a>Home</a></el-breadcrumb-item>
+			<el-breadcrumb-item class="item2" v-for="(item, index) in breadcrumbItem" :key="index"><a>Seller</a></el-breadcrumb-item>
 		</el-breadcrumb>
 	</div>
 	<div v-if="centerType" :style='{"padding":"16px 12%","margin":"0px auto","borderColor":"#d8d8d8","borderRadius":"0px","background":"none","borderWidth":"0 0 3px","width":"100%","borderStyle":"solid"}'>
-		<el-button size="mini" @click="backClick">返回</el-button>
+		<el-button size="mini" @click="backClick">Back</el-button>
 	</div>
 	<div class="list-preview" :style='{"padding":"0 12%","margin":"0px auto","alignItems":"flex-start","flexWrap":"wrap","background":"#fff","display":"flex","width":"100%","position":"relative","justifyContent":"space-between"}'>
 		
@@ -15,14 +15,11 @@
 	
     <el-form :inline="true" :model="formSearch" class="list-form-pv" :style='{"padding":"10px 0","margin":"20px 0 0","borderColor":"#ddd","alignItems":"center","flexWrap":"wrap","background":"none","borderWidth":"0 0 0px","display":"flex","width":"100%","borderStyle":"solid","height":"auto","order":"2"}'>
       <el-form-item :style='{"margin":"0 5px 0px"}'>
-	    <div class="lable" v-if="true" :style='{"width":"auto","padding":"0 0 0 0px","lineHeight":"42px","textAlign":"right","display":"inline-block"}'>店铺名：</div>
-        <el-input v-model="formSearch.dianpuming" placeholder="店铺名" @keydown.enter.native="getList(1, curFenlei)" clearable></el-input>
+	    <div class="lable" v-if="true" :style='{"width":"auto","padding":"0 0 0 0px","lineHeight":"42px","textAlign":"right","display":"inline-block"}'>Store：</div>
+        <el-input v-model="formSearch.dianpuming" placeholder="Store Name" @keydown.enter.native="getList(1, curFenlei)" clearable></el-input>
       </el-form-item>
-      <el-form-item :style='{"margin":"0 5px 0px"}'>
-	    <div class="lable" v-if="true" :style='{"width":"auto","padding":"0 0 0 0px","lineHeight":"42px","textAlign":"right","display":"inline-block"}'>店铺地址：</div>
-        <el-input v-model="formSearch.dianpudizhi" placeholder="店铺地址" @keydown.enter.native="getList(1, curFenlei)" clearable></el-input>
-      </el-form-item>
-	  <el-button v-if=" true " :style='{"cursor":"pointer","border":"0","padding":"0px 15px","margin":"0px 10px 0 0px","color":"#fff","display":"inline-block","outline":"none","borderRadius":"30px","background":"#3795c4","width":"90px","fontSize":"14px","lineHeight":"40px","height":"40px"}' type="primary" @click="getList(1, curFenlei)"><i v-if="true" :style='{"color":"#fff","margin":"0 10px 0 0","fontSize":"16px"}' class="el-icon-search"></i>查询</el-button>
+      
+	  <el-button v-if=" true " :style='{"cursor":"pointer","border":"0","padding":"0px 15px","margin":"0px 10px 0 0px","color":"#fff","display":"inline-block","outline":"none","borderRadius":"30px","background":"#3795c4","width":"90px","fontSize":"14px","lineHeight":"40px","height":"40px"}' type="primary" @click="getList(1, curFenlei)"><i v-if="true" :style='{"color":"#fff","margin":"0 10px 0 0","fontSize":"16px"}' class="el-icon-search"></i>Search</el-button>
 	  <el-button v-if="btnAuth('shangjia','新增')" :style='{"cursor":"pointer","border":"0px solid #ddd","padding":"0px 15px","margin":"0px 0px 0 0","color":"#fff","display":"inline-block","outline":"none","borderRadius":"30px","background":"#1c6a6d","width":"90px","fontSize":"14px","lineHeight":"40px","height":"40px"}' type="primary" @click="add('/index/shangjiaAdd')"><i v-if="false" :style='{"color":"#fff","margin":"0 10px 0 0","fontSize":"14px"}' class="el-icon-circle-plus-outline"></i>添加</el-button>
     </el-form>
 	<div class="select2" :style='{"width":"100%","padding":"0","margin":"10px 0 0","background":"#fff","height":"auto","order":"2"}'>
@@ -60,8 +57,8 @@
 	  :pager-count="7"
 	  :page-size="pageSize"
 	  :page-sizes="pageSizes"
-	  prev-text="上一页"
-	  next-text="下一页"
+	  prev-text="Prev"
+	  next-text="Next"
 	  :hide-on-single-page="false"
 	  :layout='["prev","pager","next"].join()'
 	  :total="total"
