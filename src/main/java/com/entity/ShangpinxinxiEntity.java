@@ -416,5 +416,13 @@ public class ShangpinxinxiEntity<T> implements Serializable {
 	public Integer getStoreupnum() {
 		return storeupnum;
 	}
+    @TableField("pdf_path")
+    private String pdfPath;
+    public String getPdfPath() {
+        return pdfPath;
+    }
 
+    public void setPdfPath(String pdfPath) {
+        this.pdfPath = pdfPath;
+    }
 }

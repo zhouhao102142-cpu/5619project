@@ -1,5 +1,7 @@
 package com.controller;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -12,10 +14,12 @@ import java.util.Iterator;
 import java.util.Date;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import com.utils.ValidatorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -248,6 +252,32 @@ public class ShangpinxinxiController {
         return R.ok().put("data", page);
     }
 
+    //read online
+    @RequestMapping("/{id}/read")
+    public void readById(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+        ShangpinxinxiEntity book = shangpinxinxiService.selectById(id);
+        if (book == null || book.getPdfPath() == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("Book or PDF not found");
+            return;
+        }
+        FileSystemResource resource = new FileSystemResource(book.getPdfPath());
+        if (!resource.exists()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("PDF file not found at path");
+            return;
+        }
+        response.setContentType("application/pdf");
+        // use book's name as file's name
+        String fileName = (book.getShangpinmingcheng() != null ? book.getShangpinmingcheng() : "book-" + id) + ".pdf";
+        response.setHeader("Content-Disposition", "inline; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO8859-1") + "\"");
+
+        try (InputStream in = resource.getInputStream(); OutputStream out = response.getOutputStream()) {
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+        }
+    }
 
     /**
      * 协同算法（基于用户的协同算法）
