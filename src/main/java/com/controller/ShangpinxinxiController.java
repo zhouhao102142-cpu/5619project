@@ -278,7 +278,31 @@ public class ShangpinxinxiController {
             while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
         }
     }
+    //download book
+    @RequestMapping("/{id}/download")
+    public void downloadById(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+        ShangpinxinxiEntity book = shangpinxinxiService.selectById(id);
+        if (book == null || book.getPdfPath() == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("Book or PDF not found");
+            return;
+        }
+        FileSystemResource resource = new FileSystemResource(book.getPdfPath());
+        if (!resource.exists()) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.getWriter().write("PDF file not found at path");
+            return;
+        }
+        response.setContentType("application/pdf");
+        String fileName = (book.getShangpinmingcheng() != null ? book.getShangpinmingcheng() : "book-" + id) + ".pdf";
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO8859-1") + "\"");
 
+        try (InputStream in = resource.getInputStream(); OutputStream out = response.getOutputStream()) {
+            byte[] buf = new byte[8192];
+            int len;
+            while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+        }
+    }
     /**
      * 协同算法（基于用户的协同算法）
      */
