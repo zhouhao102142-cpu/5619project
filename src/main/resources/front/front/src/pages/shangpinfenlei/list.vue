@@ -34,7 +34,7 @@
 		<!-- 样式一 -->
 		<div class="list1 index-pv1" :style='{"padding":"0 0 0 2%","color":"#999","flexWrap":"wrap","background":"none","display":"flex","width":"100%","fontSize":"14px","height":"auto"}'>
 			<div :style='{"border":"0px solid #ddd","cursor":"pointer","padding":"0 0 0px","boxShadow":"1px 2px 9px #ccc","margin":"0 2% 30px 0","display":"flex","justifyContent":"flex-end","overflow":"hidden","flexWrap":"wrap","background":"#fff","width":"23%","position":"relative","height":"auto"}' v-for="(item, index) in dataList" :key="index" @click.stop="toDetail(item)" class="list-item animation-box">
-				<div v-if="item.price" :style='{"padding":"0 10px","color":"#c00","textAlign":"right","width":"100%","lineHeight":"40px","fontSize":"inherit","order":"4"}' class="price"><span :style='{"fontSize":"12px"}'>￥</span>{{item.price}}</div>
+				<div v-if="item.price" :style='{"padding":"0 10px","color":"#c00","textAlign":"right","width":"100%","lineHeight":"40px","fontSize":"inherit","order":"4"}' class="price"><span :style='{"fontSize":"12px"}'>$</span>{{item.price}}</div>
 				<div :style='{"width":"auto","padding":"0px","textAlign":"left","display":"none","order":"5"}'>
 				  <span class="icon iconfont icon-shijian21" :style='{"margin":"0 2px 0 0","lineHeight":"30px","fontSize":"inherit","color":"inherit","display":"none"}'></span>
 				  <span class="text" :style='{"color":"#999","lineHeight":"30px","fontSize":"inherit"}'>{{item.addtime}}</span>

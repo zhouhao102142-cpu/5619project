@@ -9,7 +9,7 @@
     </div> -->
     <!-- <div class="price-content">
       <span>金额</span>
-      <span>￥99.0</span>
+      <span>$99.0</span>
     </div> -->
     <div class="pay-type-content">
       <div class="pay-type-item">
