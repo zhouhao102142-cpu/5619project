@@ -1,0 +1,10 @@
+﻿{
+    "title":  "Angels & Demons",
+    "authorId":  6,
+    "authorName":  "Dan Brown",
+    "status":  "published",
+    "coverPath":  "AnglesAndDemons/cover.png",
+    "storagePath":  "AnglesAndDemons/content.txt",
+    "price":  22.3,
+    "description":  "Father Leonardo Vetra, one of CERN's top physicists who has discovered how to create antimatter, is murdered, his chest branded with an ambigram of the word \"Illuminati\", an ancient anti-religious organization thought extinct. CERN director Maximilian Kohler calls Vetra's adopted daughter, Vittoria, and Harvard University Professor Robert Langdon, an expert on symbology and religious history, for help. After determining the ambigram is authentic, they discover that a canister of antimatter from Leonardo's lab has been stolen and will explode in 24 hours when the canister's battery runs out. Langdon and Vittoria go to Vatican City, where four Preferiti, the Cardinals who are the favorite candidates for Pope, are kidnapped by the Hassassin, who plans to blow up the Vatican with the antimatter canister and kill the four cardinals under the orders of \"Janus\", the leader of the Illuminati."
+}
