@@ -159,6 +159,21 @@
               @click="delClick"
             >Delete</el-button>
           </div>
+
+          <div class="btn" :style='{"width":"100%","padding":"20px 112px 20px","borderRadius":"0","flexWrap":"wrap","background":"#fff","display":"block"}'>
+            <el-button
+              :style='{"border":"0","cursor":"pointer","padding":"0 20px","margin":"0 10px 20px 0","outline":"none","color":"#fff","borderRadius":"6px","background":"#3795c4","width":"auto","lineHeight":"36px","fontSize":"14px","height":"36px"}'
+              type="primary"
+              size="small"
+              @click="openReadDialog"
+            >Read Online</el-button>
+            <el-button
+              :style='{"border":"1px solid #3795c4","cursor":"pointer","padding":"0 20px","margin":"0 10px 20px 0","outline":"none","color":"#3795c4","borderRadius":"6px","background":"none","width":"auto","lineHeight":"36px","fontSize":"14px","height":"36px"}'
+              type="primary"
+              size="small"
+              @click="downloadBook"
+            >Download Book</el-button>
+          </div>
         </div>
       </div>
 
@@ -326,6 +341,22 @@
 
     <div class="share_view" :style='{"boxShadow":"0 1px 6px rgba(0,0,0,.3)","position":"fixed","right":"0","bottom":"20%","background":"#fff","zIndex":"11"}'>
     </div>
+
+    <el-dialog
+      title="Online Reading"
+      :visible.sync="readDialogVisible"
+      width="60%"
+      :close-on-click-modal="false"
+      @close="handleReadDialogClose"
+    >
+      <div v-if="readLoading" class="book-reader-loading">Loading book content...</div>
+      <div v-else class="book-reader">
+        <h3 class="book-reader__title">{{ bookMetadata.title || detail.shangpinmingcheng }}</h3>
+        <p v-if="bookMetadata.authorName" class="book-reader__meta">Author: {{ bookMetadata.authorName }}</p>
+        <p v-if="bookMetadata.description" class="book-reader__description">{{ bookMetadata.description }}</p>
+        <pre class="book-reader__content">{{ bookContent }}</pre>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -386,7 +417,11 @@ export default {
       isInCart: false,
       centerType: false,
       shareUrl: location.href,
-      swiperBigUrl: null
+      swiperBigUrl: null,
+      readDialogVisible: false,
+      readLoading: false,
+      bookContent: '',
+      bookMetadata: {}
     }
   },
   created() {
@@ -657,6 +692,80 @@ export default {
             })
         })
     },
+    openReadDialog() {
+      if (!this.id) {
+        return
+      }
+      this.readLoading = true
+      this.readDialogVisible = true
+      this.bookContent = ''
+      this.bookMetadata = {}
+      this.$http
+        .get(`shangpinxinxi/${this.id}/read`)
+        .then(res => {
+          this.readLoading = false
+          if (res.data.code === 0 && res.data.data) {
+            const data = res.data.data
+            this.bookMetadata = data
+            this.bookContent = data.content || ''
+          } else {
+            this.readDialogVisible = false
+            this.$message.error((res.data && res.data.msg) || 'Failed to load book content')
+          }
+        })
+        .catch(() => {
+          this.readLoading = false
+          this.readDialogVisible = false
+          this.$message.error('Failed to load book content')
+        })
+    },
+    handleReadDialogClose() {
+      this.bookContent = ''
+      this.bookMetadata = {}
+    },
+    downloadBook() {
+      if (!this.id) {
+        return
+      }
+      const url = `${this.baseUrl}shangpinxinxi/${this.id}/download`
+      axios
+        .get(url, {
+          responseType: 'blob',
+          headers: { token: localStorage.getItem('frontToken') || '' }
+        })
+        .then(response => {
+          const blob = new Blob([response.data], { type: response.headers['content-type'] || 'text/plain;charset=UTF-8' })
+          let fileName = this.extractFileName(response.headers['content-disposition'])
+          if (!fileName) {
+            const base = this.detail.shangpinmingcheng || 'book'
+            fileName = `${base.replace(/[\\/:*?"<>|]/g, '_')}.txt`
+          }
+          const link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = fileName
+          link.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }))
+          window.URL.revokeObjectURL(link.href)
+        })
+        .catch(() => {
+          this.$message.error('Failed to download book')
+        })
+    },
+    extractFileName(disposition) {
+      if (!disposition) {
+        return ''
+      }
+      const filenameRegex = /filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i
+      const matches = filenameRegex.exec(disposition)
+      if (!matches) {
+        return ''
+      }
+      const value = matches[1] || matches[2] || ''
+      try {
+        return decodeURIComponent(value)
+      } catch (e) {
+        return value
+      }
+    },
     getDiscussList(page) {
       this.$http.get('discussshangpinxinxi/list', { params: { page, limit: this.pageSize, refid: this.detail.id } }).then(res => {
         if (res.data.code == 0) {
@@ -918,5 +1027,39 @@ export default {
 }
 
 /* ...（其余样式保持不变，与你提供的相同）... */
+
+.book-reader-loading {
+  font-size: 14px;
+  color: #606266;
+}
+
+.book-reader {
+  max-height: 60vh;
+  overflow-y: auto;
+  color: #303133;
+
+  &__title {
+    margin-bottom: 6px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  &__meta {
+    margin-bottom: 12px;
+    color: #909399;
+  }
+
+  &__description {
+    margin-bottom: 16px;
+    color: #606266;
+    line-height: 1.5;
+  }
+
+  &__content {
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.6;
+  }
+}
 
 </style>

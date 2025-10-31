@@ -1,7 +1,5 @@
 package com.controller;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -18,8 +16,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.utils.ValidatorUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.FileSystemResource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,13 +37,18 @@ import com.entity.ShangpinxinxiEntity;
 import com.entity.view.ShangpinxinxiView;
 
 import com.service.ShangpinxinxiService;
-import com.service.TokenService;
+import com.utils.BookStorageUtils;
+import com.utils.BookStorageUtils.BookMetadata;
 import com.utils.PageUtils;
 import com.utils.R;
 import com.utils.MPUtil;
 import com.utils.MapUtils;
 import com.utils.CommonUtil;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.util.Optional;
 import com.service.StoreupService;
 import com.entity.StoreupEntity;
 
@@ -66,6 +70,8 @@ public class ShangpinxinxiController {
 
     @Autowired
     private OrdersService ordersService;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(ShangpinxinxiController.class);
 
 
     
@@ -253,54 +259,64 @@ public class ShangpinxinxiController {
     }
 
     //read online
+    @IgnoreAuth
     @RequestMapping("/{id}/read")
-    public void readById(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
+    public R readById(@PathVariable("id") Long id) {
         ShangpinxinxiEntity book = shangpinxinxiService.selectById(id);
-        if (book == null || book.getPdfPath() == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("Book or PDF not found");
-            return;
+        if (book == null) {
+            return R.error(404, "Book not found");
         }
-        FileSystemResource resource = new FileSystemResource(book.getPdfPath());
-        if (!resource.exists()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("PDF file not found at path");
-            return;
+        Optional<BookMetadata> metadataOptional = BookStorageUtils.findMetadataByTitle(book.getShangpinmingcheng());
+        if (!metadataOptional.isPresent()) {
+            return R.error(404, "Book content not found");
         }
-        response.setContentType("application/pdf");
-        // use book's name as file's name
-        String fileName = (book.getShangpinmingcheng() != null ? book.getShangpinmingcheng() : "book-" + id) + ".pdf";
-        response.setHeader("Content-Disposition", "inline; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO8859-1") + "\"");
-
-        try (InputStream in = resource.getInputStream(); OutputStream out = response.getOutputStream()) {
-            byte[] buf = new byte[8192];
-            int len;
-            while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+        BookMetadata metadata = metadataOptional.get();
+        if (!metadata.hasReadableContent()) {
+            return R.error(404, "Book content not found");
+        }
+        try {
+            Map<String, Object> data = new HashMap<String, Object>();
+            data.put("id", id);
+            data.put("title", metadata.getTitle());
+            data.put("authorName", metadata.getAuthorName());
+            data.put("description", metadata.getDescription());
+            data.put("content", metadata.readContent());
+            return R.ok().put("data", data);
+        } catch (IOException e) {
+            LOGGER.error("Failed to read book content for id {}", id, e);
+            return R.error(500, "Failed to load book content");
         }
     }
     //download book
+    @IgnoreAuth
     @RequestMapping("/{id}/download")
     public void downloadById(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
         ShangpinxinxiEntity book = shangpinxinxiService.selectById(id);
-        if (book == null || book.getPdfPath() == null) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("Book or PDF not found");
+        if (book == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book not found");
             return;
         }
-        FileSystemResource resource = new FileSystemResource(book.getPdfPath());
-        if (!resource.exists()) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            response.getWriter().write("PDF file not found at path");
+        Optional<BookMetadata> metadataOptional = BookStorageUtils.findMetadataByTitle(book.getShangpinmingcheng());
+        if (!metadataOptional.isPresent()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book content not found");
             return;
         }
-        response.setContentType("application/pdf");
-        String fileName = (book.getShangpinmingcheng() != null ? book.getShangpinmingcheng() : "book-" + id) + ".pdf";
+        BookMetadata metadata = metadataOptional.get();
+        if (!metadata.hasReadableContent()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Book file is missing");
+            return;
+        }
+        String fileName = metadata.getSuggestedFileName(book.getShangpinmingcheng());
+        response.setContentType("text/plain;charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + new String(fileName.getBytes("UTF-8"), "ISO8859-1") + "\"");
 
-        try (InputStream in = resource.getInputStream(); OutputStream out = response.getOutputStream()) {
+        try (InputStream in = Files.newInputStream(metadata.getContentPath());
+             OutputStream out = response.getOutputStream()) {
             byte[] buf = new byte[8192];
             int len;
-            while ((len = in.read(buf)) != -1) out.write(buf, 0, len);
+            while ((len = in.read(buf)) != -1) {
+                out.write(buf, 0, len);
+            }
         }
     }
     /**
